@@ -19,23 +19,34 @@ namespace SoftRenderer
             _window.Closed += OnWindowClosed;
 
             Model model = new Model("obj/african_head.obj");
+
+            Vector3f lightDir = new Vector3f(0, 0, -1);
+
             for (int i = 0; i < model.NumFaces; i++)
             {
                 List<int> faces = model.Face(i);
+                Vector2i[] screenCoords = new Vector2i[3];
+                Vector3f[] worldCoords = new Vector3f[3];
                 for (int j = 0; j < 3; j++)
                 {
-                    Vector3f v0 = model.Vert(faces[j]);
-                    Vector3f v1 = model.Vert(faces[(j + 1) % 3]);
+                    Vector3f v = model.Vert(faces[j]);
+                    screenCoords[j] = new Vector2i((int) ((v.X + 1.0f) * width / 2.0f), (int) ((v.Y + 1.0f) * height / 2.0f));
+                    worldCoords[j] = v;
+                }
 
-                    int x0 = (int) ((v0.X + 1.0f) * width / 2.0f);
-                    int y0 = (int) ((v0.Y + 1.0f) * height / 2.0f);
-                    int x1 = (int) ((v1.X + 1.0f) * width / 2.0f);
-                    int y1 = (int) ((v1.Y + 1.0f) * height / 2.0f);
+                Vector3f n = Util.Pow(Util.Sub(worldCoords[2], worldCoords[0]),
+                    Util.Sub(worldCoords[1], worldCoords[0]));
+                Util.Normalize(ref n);
 
-                    Drawing.Line(x0, y0, x1, y1, _canvas, Color.White);
+                float intensity = Util.Mul(n, lightDir);
+
+                if (intensity > 0)
+                {
+                    Color color = new Color((byte) (intensity * 255), (byte) (intensity * 255), (byte) (intensity * 255), 255);
+                    Drawing.Triangle(ref screenCoords[0], ref screenCoords[1], ref screenCoords[2], _canvas, color);
                 }
             }
-            
+
             _canvas.FlipPixelsVertically();
             _canvas.Update();
         }

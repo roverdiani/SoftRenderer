@@ -10,8 +10,8 @@ namespace SoftRenderer
 
         private byte[] _pixels;
 
-        private readonly int _width;
-        private readonly int _height;
+        public int Width { get; private set; }
+        public int Height { get; private set; }
 
         public Canvas(int width, int height)
         {
@@ -19,16 +19,16 @@ namespace SoftRenderer
             _sprite = new Sprite(_texture);
             
             _pixels = new byte[width * height * 4];
-            _width = width;
-            _height = height;
+            Width = width;
+            Height = height;
         }
 
         public void SetPixel(int x, int y, Color color)
         {
-            if (x < 0 || x >= _width || y < 0 || y >= _height)
+            if (x < 0 || x >= Width || y < 0 || y >= Height)
                 return;
             
-            int index = (_width * y + x) * 4;
+            int index = (Width * y + x) * 4;
             _pixels[index + 0] = color.R;
             _pixels[index + 1] = color.G;
             _pixels[index + 2] = color.B;
@@ -38,10 +38,10 @@ namespace SoftRenderer
         public void FlipPixelsVertically()
         {
             byte[] flippedData = new byte[_pixels.Length];
-            for (int k = 0; k < _height; k++)
+            for (int k = 0; k < Height; k++)
             {
-                int j = _height - k - 1;
-                Buffer.BlockCopy(_pixels, k * _width * 4, flippedData, j * _width * 4, _width * 4);
+                int j = Height - k - 1;
+                Buffer.BlockCopy(_pixels, k * Width * 4, flippedData, j * Width * 4, Width * 4);
             }
 
             _pixels = flippedData;
